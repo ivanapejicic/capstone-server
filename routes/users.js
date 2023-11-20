@@ -3,12 +3,12 @@ const usersController = require('../controllers/users-controller');
 
 router
     .route('/users')
-    .post(usersController.add);
+    .get(usersController.index)  
+    .post(usersController.add);  
 
-router.route('users/:id')
-    .get(usersController.findOne)
-    .put(usersController.update)
-    .delete(usersController.remove);
+router.route('/users/:id')
+    .get(usersController.findOne)   
+    .put(usersController.update)    
+    .delete(usersController.remove); 
 
 module.exports = router;
-

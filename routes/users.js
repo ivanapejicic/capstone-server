@@ -3,6 +3,8 @@ const usersController = require('../controllers/users-controller');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authorize = require('../middleware/authorize');
+const knex = require('knex')(require('../knexfile'));
+
 
 router
     .route('/')
@@ -15,23 +17,20 @@ router.route('/:id')
     .delete(usersController.remove);
 
 router.post("/register", async (req, res) => {
-    const { username, email, password, fullName, miniBio, phoneNumber } = req.body;
-
-    if (!username || !email|| !password || !fullName || !miniBio || !phoneNumber) {
-        return res.status(400).json("Please enter the required fields.");
+    const { username, email, password, full_name, mini_bio, phone_number } = req.body;
+    if (!username || !email || !password || !full_name || !mini_bio || !phone_number) {
+        return res.status(400).json({ error: "Please enter the required fields." });
     }
-
     const hashedPassword = bcrypt.hashSync(password);
 
     // Create the new user
     const newUser = {
         username,
         email,
-        password,
-        fullName,
-        miniBio,
-        phoneNumber,
-        password: hashedPassword
+        full_name,
+        mini_bio,
+        phone_number,
+        password_hash: hashedPassword
     };
 
     // Insert it into our database
@@ -58,7 +57,7 @@ router.post("/login", async (req, res) => {
     }
 
     // Validate the password
-    const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+    const isPasswordCorrect = bcrypt.compareSync(password, user.password_hash);
     if (!isPasswordCorrect) {
         return res.status(400).send("Invalid password");
     }
@@ -70,39 +69,39 @@ router.post("/login", async (req, res) => {
         { expiresIn: "24h" }
     );
 
-    res.json({ token })
+    res.json({ token });
 });
 
 router.get('/current', async (req, res) => {
-	if(!req.headers.authorization) {
-		return res.status(401).send('Please login')
-	}
+    if (!req.headers.authorization) {
+        return res.status(401).send('Please login')
+    }
 
-	const authHeader = req.headers.authorization;
-	const authToken = authHeader.split(' ')[1];
-
-	try {
-		const decoded = jwt.verify(authToken, process.env.JWT_KEY)
-
-		const user = await knex('users').where({id: decoded.id}).first();
-		delete user.password;
-		res.json(user)
-
-	} catch(error) {
-		return res.status(401).send("Invalid auth token");
-	}
-})
-
-router.get("/", authorize, async (req, res)=> {
+    const authHeader = req.headers.authorization;
+    const authToken = authHeader.split(' ')[1];
 
     try {
-		const users = await knex
-		.select("*")
-		.from("users")
-		res.json(users);
-	} catch (error) {
-		res.status(500).json({ message: "Unable to retrieve users data" });
-	}
+        const decoded = jwt.verify(authToken, process.env.JWT_KEY)
+
+        const user = await knex('users').where({ id: decoded.id }).first();
+        delete user.password;
+        res.json(user)
+
+    } catch (error) {
+        return res.status(401).send("Invalid auth token");
+    }
+})
+
+router.get("/", authorize, async (req, res) => {
+
+    try {
+        const users = await knex
+            .select("*")
+            .from("users")
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: "Unable to retrieve users data" });
+    }
 })
 
 module.exports = router;

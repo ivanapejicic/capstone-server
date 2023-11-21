@@ -6,15 +6,15 @@ const authorize = require('../middleware/authorize');
 const knex = require('knex')(require('../knexfile'));
 
 
-router
-    .route('/')
-    .get(usersController.index)
-    .post(usersController.add);
+// router
+//     .route('/')
+//     .get(usersController.index)
+//     .post(usersController.add);
 
-router.route('/:id')
-    .get(usersController.findOne)
-    .put(usersController.update)
-    .delete(usersController.remove);
+// router.route('/:id')
+//     .get(usersController.findOne)
+//     .put(usersController.update)
+//     .delete(usersController.remove);
 
 router.post("/register", async (req, res) => {
     const { username, email, password, full_name, mini_bio, phone_number } = req.body;
@@ -50,21 +50,18 @@ router.post("/login", async (req, res) => {
         return res.status(400).send("Please enter the required fields");
     }
 
-    // Find the user
     const user = await knex('users').where({ username: username }).first();
     if (!user) {
         return res.status(400).send("Invalid username");
     }
 
-    // Validate the password
     const isPasswordCorrect = bcrypt.compareSync(password, user.password_hash);
     if (!isPasswordCorrect) {
         return res.status(400).send("Invalid password");
     }
 
-    // Generate a token
     const token = jwt.sign(
-        { id: user.id, username: user.username },
+        { user_id: user.user_id, username: user.username },
         process.env.JWT_KEY,
         { expiresIn: "24h" }
     );
@@ -73,26 +70,26 @@ router.post("/login", async (req, res) => {
 });
 
 router.get('/current', async (req, res) => {
-    if (!req.headers.authorization) {
-        return res.status(401).send('Please login')
-    }
+	if(!req.headers.authorization) {
+		return res.status(401).send('Please login')
+	}
 
-    const authHeader = req.headers.authorization;
-    const authToken = authHeader.split(' ')[1];
+	const authHeader = req.headers.authorization;
+	const authToken = authHeader.split(' ')[1];
 
-    try {
-        const decoded = jwt.verify(authToken, process.env.JWT_KEY)
+	try {
+		const decoded = jwt.verify(authToken, process.env.JWT_KEY)
 
-        const user = await knex('users').where({ id: decoded.id }).first();
-        delete user.password;
-        res.json(user)
+		const user = await knex('users').where({user_id: decoded.user_id}).first();
+		delete user.password;
+		res.json(user)
 
-    } catch (error) {
-        return res.status(401).send("Invalid auth token");
-    }
+	} catch(error) {
+		return res.status(401).send("Invalid auth token");
+	}
 })
 
-router.get("/", authorize, async (req, res) => {
+router.get("/", authorize, async (_req, res) => {
 
     try {
         const users = await knex

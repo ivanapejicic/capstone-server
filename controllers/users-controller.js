@@ -57,7 +57,7 @@ const update = async (req, res) => {
 };
 
 const add = async (req, res) => {
-    if (!req.body.username || !req.body.email) {
+    if (!req.body.username || !req.body.email || !req.body.password) {
         return res.status(400).json({
             message: "Please fill all necessary info for your profile",
         });

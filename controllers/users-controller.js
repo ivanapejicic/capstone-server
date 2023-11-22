@@ -31,14 +31,6 @@ const findOne = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const userFound = await knex("users").where({ user_id: req.params.id });
-
-        if (!userFound || userFound.length === 0) {
-            return res.status(404).json({
-                message: `User with ID ${req.params.id} not found`
-            });
-        }
-
         const rowsUpdated = await knex("users").where({ user_id: req.params.id }).update(req.body);
 
         if (rowsUpdated === 0) {

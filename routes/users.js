@@ -11,10 +11,9 @@ const knex = require('knex')(require('../knexfile'));
 //     .get(usersController.index)
 //     .post(usersController.add);
 
-// router.route('/:id')
-//     .get(usersController.findOne)
-//     .put(usersController.update)
-//     .delete(usersController.remove);
+router.route('/:id')
+    .put(usersController.update)
+    .delete(usersController.remove);
 
 router.post("/register", async (req, res) => {
     const { username, email, password, full_name, mini_bio, phone_number } = req.body;

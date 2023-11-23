@@ -8,14 +8,14 @@ exports.up = function (knex) {
         table
             .integer('user_id')
             .unsigned()
-            .references('user_id') 
-            .inTable('users') 
+            .references('user_id')
+            .inTable('users')
             .onUpdate('CASCADE')
             .onDelete('CASCADE');
         table.string('start_location').notNullable();
         table.string('end_location').notNullable();
-        table.dateTime('departure_time').notNullable();
-        table.dateTime('return_time'); 
+        table.time('departure_time').notNullable(); 
+        table.time('return_time'); 
         table.timestamp('created_at').defaultTo(knex.fn.now());
         table.timestamp('updated_at').defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
     });

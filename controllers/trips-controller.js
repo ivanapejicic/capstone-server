@@ -23,37 +23,6 @@ const validateTripData = (data) => {
     };
 };
 
-// const index = async (req, res) => {
-//     try {
-
-//         const usersFound = await knex("users")
-//             .where({ id: req.params.id });
-
-//         if (usersFound.length === 0) {
-//             return res.status(404).json({
-//                 message: `No user with ID ${req.params.id} found`,
-//             });
-//         }
-
-//         const trips = await knex("users")
-//             .join("trips", "users.id", "trips.user_id")
-//             .where({ 'users.user_id': req.params.id })
-//             .select('trips.trip_id', 'starting_zip', 'ending_zip', 'departure_time', 'return_time');
-
-//         if (trips.length === 0) {
-//             return res.status(200).json([{
-//                 message: `No trips found for user with ID ${req.params.id}`,
-//             }]);
-//         }
-
-//         res.json(trips);
-//     } catch (error) {
-//         res.status(500).json({
-//             message: `Unable to retrieve trips for user with ID ${req.params.id}: ${error}`,
-//         });
-//     }
-// };
-
 const getAllTrips = async (_req, res) => {
     try {
         const allTrips = await knex("trips")
@@ -173,7 +142,6 @@ const remove = async (req, res) => {
 
 module.exports = {
     getAllTrips,
-    // index,
     findOne,
     update,
     add,

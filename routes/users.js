@@ -5,12 +5,6 @@ const jwt = require('jsonwebtoken');
 const authorize = require('../middleware/authorize');
 const knex = require('knex')(require('../knexfile'));
 
-
-// router
-//     .route('/')
-//     .get(usersController.index)
-//     .post(usersController.add);
-
 router.route('/:id')
     .put(usersController.update)
     .delete(usersController.remove);
